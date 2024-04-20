@@ -6,11 +6,11 @@ const EXAMPLE_VIDEO =
 export async function POST(req) {
     try {
         // Parse the JSON body from the request
-        const { keyword } = await req.json();
+        const { keywords } = await req.json();
 
         // If no keyword is provided, return an example video
-        if (!keyword) {
-            // Return the default video link if keyword is absent or empty
+        if (!keywords || !keywords.length) {
+            // Return the default video link if no valid keywords array is provided
             return new Response(JSON.stringify({ videoLink: EXAMPLE_VIDEO }), {
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -24,24 +24,28 @@ export async function POST(req) {
         headers.append('Authorization', process.env.PEXELS_API_KEY);
 
         // Make a GET request to Pexels API using fetch
-        const response = await fetch(endpoint + '?query=' + encodeURIComponent(keyword), {
-            method: 'GET',
-            headers: headers
-        });
+        for (let keyword of keywords) {
+            // Make a GET request to Pexels API using fetch
+            const response = await fetch(`${endpoint}?query=${encodeURIComponent(keyword)}`, {
+                method: 'GET',
+                headers: headers
+            });
 
-        // Check if the fetch was successful
-        if (!response.ok) {
-            throw new Error('Failed to fetch videos from Pexels API');
+            if (response.ok) {
+                const data = await response.json();
+                // Check if there are any videos returned
+                if (data.videos && data.videos.length > 0) {
+                    const videoLink = data.videos[0].video_files[0].link;
+                    // Return the first found video link
+                    return new Response(JSON.stringify({ videoLink }), {
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                }
+            }
         }
 
-        // Convert the response to JSON
-        const data = await response.json();
-
-        // Check if there are any videos returned
-        const videoLink = data.videos.length > 0 ? data.videos[0].video_files[0].link : EXAMPLE_VIDEO;
-
-        // Return the video link in response
-        return new Response(JSON.stringify({ videoLink }), {
+        // If no videos found for any keywords, return the default video link
+        return new Response(JSON.stringify({ videoLink: EXAMPLE_VIDEO }), {
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
