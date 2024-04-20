@@ -10,6 +10,9 @@ export default function Home() {
   const [coverTitle, setCoverTitle] = useState('');
   const [coverDescription, setCoverDescription] = useState('');
   const [coverVideoLink, setCoverVideoLink] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [responses, setResponses] = useState([]);
 
   const generateForm = async () => {
     const prompt = promptRef.current.value;
@@ -25,10 +28,11 @@ export default function Home() {
     const coverJson = await coverResponse.json();
     const coverOutput = JSON.parse(coverJson.output);
 
-    const { title, description, keywords } = coverOutput;
+    const { title, description, keywords, questions } = coverOutput;
     console.log(keywords);
     setCoverTitle(title);
     setCoverDescription(description);
+    setQuestions(questions);
 
     const videoResponse = await fetch('/api/video', {
       method: 'POST',
@@ -40,6 +44,26 @@ export default function Home() {
     const { videoLink } = await videoResponse.json();
     setCoverVideoLink(videoLink);
     setIsGenerated(true);
+  };
+
+  const generateQuestion = async ({ question, response, nextQuestion }) => {
+    const questionResponse = await fetch('/api/question', {
+      method: 'POST',
+      body: JSON.stringify({
+        coverTitle,
+        coverDescription,
+        question,
+        response,
+        nextQuestion,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const questionJson = await questionResponse.json();
+    const questionOutput = JSON.parse(questionJson.output);
+    console.log(questionOutput);
   };
 
   return (
@@ -57,6 +81,14 @@ export default function Home() {
           title={coverTitle}
           description={coverDescription}
           videoLink={coverVideoLink}
+          onClickStart={() => {
+            generateQuestion({
+              question: '',
+              response: '',
+              nextQuestion: questions[0],
+            });
+            setQuestionIndex(1);
+          }}
         />
       )}
     </div>

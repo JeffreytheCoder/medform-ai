@@ -2,7 +2,12 @@
 import { TypeAnimation } from 'react-type-animation';
 import { Button } from './ui/button';
 
-export default function CoverPage({ title, description, videoLink }) {
+export default function CoverPage({
+  title,
+  description,
+  videoLink,
+  onClickStart,
+}) {
   return (
     <div
       style={{
@@ -59,7 +64,7 @@ export default function CoverPage({ title, description, videoLink }) {
           wrapper="h3"
           className="scroll-m-20 text-2xl tracking-tight"
         />
-        <Button>Get Started</Button>
+        <Button onClick={onClickStart}>Get Started</Button>
       </div>
     </div>
   );
