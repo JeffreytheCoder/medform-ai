@@ -3,11 +3,21 @@ import { useRef, useEffect, useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import AudioTranscriber from './AudioTranscriber';
+import { Response, Textarea } from './ui/response';
 
 export default function QuestionPage({ question, videoLink, onClickNext }) {
   const responseRef = useRef();
   const [audioUrl, setAudioUrl] = useState('');
   const audioRef = useRef(new Audio());
+
+  const updateResponse = (response) => {
+    responseRef.current.value = (
+      responseRef.current.value +
+      ' ' +
+      response
+    ).trim();
+  };
 
   useEffect(() => {
     if (audioUrl) {
@@ -25,12 +35,6 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
       audioRef.current.currentTime = 0;
     };
   }, [audioUrl]);
-
-  function handleKeyPress(event) {
-    if (event.key === 'Enter') {
-      onClickNext(question, responseRef.current.value);
-    }
-  }
 
   const handleTextToSpeech = async (text) => {
     try {
@@ -94,7 +98,7 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
           left: '0',
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
           zIndex: '1',
         }}
       />
@@ -105,7 +109,8 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
           left: '50%',
           transform: 'translate(-50%, -50%)',
           color: 'white',
-          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
           zIndex: '2',
           width: '50%',
         }}
@@ -115,7 +120,7 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
           cursor
           sequence={[question]}
           wrapper="h3"
-          className="scroll-m-20 text-2xl tracking-tight"
+          className={`scroll-m-20 text-2xl tracking-tight`}
           speed={30}
         />
         <div
@@ -126,18 +131,30 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
             margin: '30px 0',
           }}
         >
-          <Input
+          <Response
             style={{ width: '100%' }}
             ref={responseRef}
             key={question}
-            onKeyDown={handleKeyPress}
+            placeholder="Answer here"
           />
         </div>
-        <Button
-          onClick={() => onClickNext(question, responseRef.current.value)}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'center',
+            gap: '10px',
+          }}
         >
-          Next
-        </Button>
+          <AudioTranscriber updateResponse={updateResponse} />
+          <Button
+            size="lg"
+            onClick={() => onClickNext(question, responseRef.current.value)}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

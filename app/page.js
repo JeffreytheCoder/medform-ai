@@ -100,6 +100,7 @@ export default function Home() {
         </h3>
         <Textarea ref={promptRef} />
         <Button onClick={generateForm}>Generate Form</Button>
+        <AudioTranscriber />
       </div>
     );
   } else if (questionIndex === 0) {
