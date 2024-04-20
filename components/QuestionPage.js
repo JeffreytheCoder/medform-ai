@@ -2,9 +2,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
 import AudioTranscriber from './AudioTranscriber';
-import { Response, Textarea } from './ui/response';
+import { Textarea } from './ui/textarea';
 
 export default function QuestionPage({ question, videoLink, onClickNext }) {
   const responseRef = useRef();
@@ -131,7 +130,7 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
             margin: '30px 0',
           }}
         >
-          <Response
+          <Textarea
             style={{ width: '100%' }}
             ref={responseRef}
             key={question}

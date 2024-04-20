@@ -1,10 +1,8 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import AudioTranscriber from '../components/AudioTranscriber';
 import CoverPage from '@/components/CoverPage';
 import QuestionPage from '@/components/QuestionPage';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 
 export default function Home() {
   const promptRef = useRef();
@@ -98,9 +96,8 @@ export default function Home() {
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Describe the form you want to generate
         </h3>
-        <Textarea ref={promptRef} />
+        <textarea ref={promptRef} />
         <Button onClick={generateForm}>Generate Form</Button>
-        <AudioTranscriber />
       </div>
     );
   } else if (questionIndex === 0) {
