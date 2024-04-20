@@ -29,19 +29,37 @@ const format_prompt = (
   
   JSON output format:
   {
-    "feedback": string,
     "question": string,
     "pass": boolean
     "keywords" : string[]
   }
 
-  If you think the patient did not answer the last question correctly, set "question" to kindly asking the patient the last question in a rephrased way that ask for more elaboration. In the JSON output, set "pass" to false.
+  Set "pass" to true. 
+  
+
   
   Otherwise, if last question and response are empty or undefined, set the JSON output's "question" field to the exact value within the \`NEXT_QUESTION\`, which is \"${nextQuestion}\". After that, set "pass" to true.
   
-  Otherwise, based on the patient's answer, set the JSON's \"feedback\" field to an empathetic feedback to the patient's response \"${response}\". The tone of this feedback needs to be very positive and personal. The tone needs to be casual, like family members speaking to each other. 
-
   Lastly, set "keywords" to an array of 3-5 strings that are relevant to the question.
+  `;
+};
+
+const write_feedback = (
+    title,
+    description,
+    question,
+    response,
+    nextQuestion
+) => {
+  return `For the last question:
+  
+    ${question}
+  
+    The patient has answered:
+  
+    ${response}
+    
+    Based on the patient's answer, give an empathetic feedback to the patient's response. The tone of this feedback needs to be very positive and personal The tone needs to be casual, like family members speaking to each other. It should be one or two sentences long.
   `;
 };
 
@@ -66,13 +84,31 @@ export async function POST(req) {
     ],
     model: 'gpt-3.5-turbo',
   });
+  const question_msg = completion.choices[0].message.content;
 
-  console.log(question);
-  console.log(response);
-  console.log('next question: ', nextQuestion);
+  const feedback = await openai.chat.completions.create({
+    messages: [
+      {
+        role: 'system',
+        content: write_feedback(
+            title,
+            description,
+            question,
+            response,
+            nextQuestion
+        ),
+      },
+    ],
+    model: 'gpt-3.5-turbo',
+  });
 
-  const output = completion.choices[0].message.content;
-  console.log(output);
 
-  return Response.json({ output });
+  const feedback_msg = feedback.choices[0].message.content;
+
+  let output = JSON.parse(question_msg);
+
+  output.feedback = feedback_msg;
+  return new Response(JSON.stringify(output), {
+    headers: {'Content-Type': 'application/json'},
+  });
 }

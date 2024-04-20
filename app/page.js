@@ -73,9 +73,9 @@ export default function Home() {
     }, [audioUrl]);
 
   const generateQuestion = async ({ lastQuestion, response }) => {
-      console.log('index: ', questionIndex);
-      console.log('questions length: ', questions.length);
-      console.log(questions);
+      // console.log('index: ', questionIndex);
+      // console.log('questions length: ', questions.length);
+      // console.log(questions);
     const questionResponse = await fetch('/api/question', {
       method: 'POST',
       body: JSON.stringify({
@@ -94,7 +94,8 @@ export default function Home() {
     });
 
     const questionJson = await questionResponse.json();
-    const { feedback, question, pass, keywords } = JSON.parse(questionJson.output);
+
+    const { feedback, question, pass, keywords } = questionJson;
     
     setCurrentQuestion(question);
     if (questionIndex !== 0) {
@@ -120,7 +121,6 @@ export default function Home() {
       const { videoLink } = await videoResponse.json();
       setVideoLink(videoLink);
     }
-    console.log(questionIndex);
   };
   
   const handleTextToSpeech = async () => {
@@ -144,7 +144,6 @@ export default function Home() {
             }
 
             const data = await response.json();
-            console.log(data);
 
             // Optionally: Handle the speech file URL (e.g., play it or display it)
             if (data.fileUrl) {
