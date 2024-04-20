@@ -10,7 +10,7 @@ export default function Home() {
     const generateForm = async () => {
         const videoResponse = await fetch('/api/video', {
             method: 'POST',
-            body: JSON.stringify({}),
+            body: JSON.stringify({'keyword': 'nature'}),
             headers: {
                 'Content-Type': 'application/json',
             },
