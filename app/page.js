@@ -1,7 +1,6 @@
 'use client';
-import Image from "next/image";
 import { useState, useRef, useEffect } from 'react';
-import AudioTranscriber from "../components/AudioTranscriber";
+import AudioTranscriber from '../components/AudioTranscriber';
 import CoverPage from '@/components/CoverPage';
 import QuestionPage from '@/components/QuestionPage';
 import { Button } from '@/components/ui/button';
@@ -49,26 +48,6 @@ export default function Home() {
     setIsGenerated(true);
   };
 
-    const [coverVideoLink, setCoverVideoLink] = useState('');
-    const [audioUrl, setAudioUrl] = useState('');
-    const audioRef = useRef(new Audio());
-
-    useEffect(() => {
-        // This effect updates the source of the audio whenever audioUrl changes
-        if (audioUrl) {
-            const currentAudio = audioRef.current;
-            currentAudio.src = audioUrl;
-            currentAudio.play()
-                .catch(error => console.error('Error playing the audio file:', error));
-        }
-
-        return () => {
-            // Clean up the audio if the component unmounts or url changes
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-        };
-    }, [audioUrl]);
-
   const generateQuestion = async ({ lastQuestion, response }) => {
     const questionResponse = await fetch('/api/question', {
       method: 'POST',
@@ -89,7 +68,7 @@ export default function Home() {
 
     const questionJson = await questionResponse.json();
     const { question, pass, keywords } = JSON.parse(questionJson.output);
-    
+
     setCurrentQuestion(question);
     if (pass) {
       if (questionIndex === questions.length - 1) {
@@ -112,41 +91,6 @@ export default function Home() {
     }
     console.log(questionIndex);
   };
-  
-  const handleTextToSpeech = async () => {
-        const defaultText = "I shall be telling this with a sigh\n" +
-            "Somewhere ages and ages hence:\n" +
-            "Two roads diverged in a wood, and I—\n" +
-            "I took the one less traveled by,\n" +
-            "And that has made all the difference.";
-
-        try {
-            const response = await fetch('/api/speech', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: defaultText})
-            });
-
-            if (!response.ok) {
-                console.error('Network response was not ok');
-            }
-
-            const data = await response.json();
-            console.log(data);
-
-            // Optionally: Handle the speech file URL (e.g., play it or display it)
-            if (data.fileUrl) {
-                setAudioUrl(data.fileUrl);
-            } else {
-                console.error('Failed to load the audio file:', data.error);
-            }
-        }
-        catch (error) {
-            console.error('Failed to fetch:', error);
-        }
-    };
 
   if (!isGenerated) {
     return (
