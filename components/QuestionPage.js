@@ -5,8 +5,10 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Input } from './ui/input';
 
-export default function QuestionPage({ question, videoLink, onClickNext }) {
+export default function QuestionPage({ feedback, question, videoLink, onClickNext }) {
   const responseRef = useRef();
+
+  const displayText = feedback + "\n\n" + question;
   return (
     <div
       style={{
@@ -54,12 +56,15 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
           width: '50%',
         }}
       >
+
         <TypeAnimation
           key={question}
           cursor
-          sequence={[question]}
+          sequence={[displayText]}
           wrapper="h3"
+          speed={65}
           className="scroll-m-20 text-2xl tracking-tight"
+          style={{ whiteSpace: 'pre-line'}}
         />
         <div
           style={{
@@ -69,7 +74,8 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
             margin: '30px 0',
           }}
         >
-          <Input style={{ width: '100%' }} ref={responseRef} key={question} />
+
+            <Input style={{ width: '100%' }} ref={responseRef} key={question} />
         </div>
         <Button
           onClick={() => onClickNext(question, responseRef.current.value)}
