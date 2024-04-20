@@ -1,6 +1,7 @@
 'use client';
 import Image from "next/image";
 import { useState, useRef, useEffect } from 'react';
+import AudioTranscriber from "../components/AudioTranscriber";
 
 
 export default function Home() {
@@ -74,8 +75,16 @@ export default function Home() {
 
     return (
         <div>
-            <button onClick={generateForm}>Generate Form</button>
-            <button onClick={handleTextToSpeech}>Convert Text to Speech</button>
+            <div>
+                <button onClick={generateForm}>Generate Form</button>
+            </div>
+
+            <div>
+                <button onClick={handleTextToSpeech}>Convert Text to Speech</button>
+            </div>
+            <h1>---</h1>
+            <AudioTranscriber />
+
             <video
                 style={{
                     position: 'absolute',
