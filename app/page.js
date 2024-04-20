@@ -1,5 +1,6 @@
 'use client';
 import CoverPage from '@/components/CoverPage';
+import QuestionPage from '@/components/QuestionPage';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useRef, useState } from 'react';
@@ -9,10 +10,11 @@ export default function Home() {
   const [isGenerated, setIsGenerated] = useState(false);
   const [coverTitle, setCoverTitle] = useState('');
   const [coverDescription, setCoverDescription] = useState('');
-  const [coverVideoLink, setCoverVideoLink] = useState('');
+  const [videoLink, setVideoLink] = useState('');
   const [questions, setQuestions] = useState([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [responses, setResponses] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState('');
 
   const generateForm = async () => {
     const prompt = promptRef.current.value;
@@ -42,19 +44,19 @@ export default function Home() {
       },
     });
     const { videoLink } = await videoResponse.json();
-    setCoverVideoLink(videoLink);
+    setVideoLink(videoLink);
     setIsGenerated(true);
   };
 
-  const generateQuestion = async ({ question, response, nextQuestion }) => {
+  const generateQuestion = async ({ lastQuestion, response }) => {
     const questionResponse = await fetch('/api/question', {
       method: 'POST',
       body: JSON.stringify({
         coverTitle,
         coverDescription,
-        question,
+        question: lastQuestion,
         response,
-        nextQuestion,
+        nextQuestion: questions[questionIndex + 1],
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -62,36 +64,59 @@ export default function Home() {
     });
 
     const questionJson = await questionResponse.json();
-    const questionOutput = JSON.parse(questionJson.output);
-    console.log(questionOutput);
+    console.log(questionJson);
+    const { question, pass, keywords } = JSON.parse(questionJson.output);
+
+    const videoResponse = await fetch('/api/video', {
+      method: 'POST',
+      body: JSON.stringify({ keywords }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const { videoLink } = await videoResponse.json();
+    setVideoLink(videoLink);
+
+    setCurrentQuestion(question);
+    if (pass) {
+      setResponses([...responses, response]);
+      setQuestionIndex(questionIndex + 1);
+      setVideoLink(videoLink);
+    }
   };
 
-  return (
-    <div>
-      {!isGenerated ? (
-        <div>
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Describe the form you want to generate
-          </h3>
-          <Textarea ref={promptRef} />
-          <Button onClick={generateForm}>Generate Form</Button>
-        </div>
-      ) : (
-        <CoverPage
-          title={coverTitle}
-          description={coverDescription}
-          videoLink={coverVideoLink}
-          onClickStart={() => {
-            generateQuestion({
-              question: '',
-              response: '',
-              nextQuestion: questions[0],
-            });
-            setQuestionIndex(1);
-          }}
-        />
-      )}
-    </div>
-  );
+  if (!isGenerated) {
+    return (
+      <div>
+        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Describe the form you want to generate
+        </h3>
+        <Textarea ref={promptRef} />
+        <Button onClick={generateForm}>Generate Form</Button>
+      </div>
+    );
+  } else if (questionIndex === 0) {
+    return (
+      <CoverPage
+        title={coverTitle}
+        description={coverDescription}
+        videoLink={videoLink}
+        onClickStart={() => {
+          generateQuestion({
+            question: '',
+            response: '',
+            nextQuestion: questions[0],
+          });
+        }}
+      />
+    );
+  } else {
+    return (
+      <QuestionPage
+        question={currentQuestion}
+        videoLink={videoLink}
+        onClickNext={generateQuestion}
+      />
+    );
+  }
 }
-``;

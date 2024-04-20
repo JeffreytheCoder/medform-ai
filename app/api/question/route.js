@@ -29,11 +29,14 @@ const format_prompt = (
   {
     "question": string,
     "pass": boolean
+    "keywords" : string[]
   }
 
   If you think the patient did not answer the last question correctly, set "question" to kindly asking the patient the last question in another way, and set "pass" to false.
   
   Otherwise, or if last question and response are empty, set "question" to the next question, and set "pass" to true.
+
+  Lastly, set "keywords" to an array of 3-5 strings that are relevant to the question.
   `;
 };
 
