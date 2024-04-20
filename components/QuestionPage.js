@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { Input } from './ui/input';
 
 export default function QuestionPage({ question, videoLink, onClickNext }) {
   const responseRef = useRef();
@@ -50,17 +51,26 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
           color: 'white',
           textAlign: 'center',
           zIndex: '2',
+          width: '50%',
         }}
       >
         <TypeAnimation
           key={question}
-          style={{ margin: '30px 0' }}
           cursor
           sequence={[question]}
           wrapper="h3"
           className="scroll-m-20 text-2xl tracking-tight"
         />
-        <Textarea ref={responseRef} />
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            margin: '30px 0',
+          }}
+        >
+          <Input style={{ width: '100%' }} ref={responseRef} key={question} />
+        </div>
         <Button
           onClick={() => onClickNext(question, responseRef.current.value)}
         >

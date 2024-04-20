@@ -34,7 +34,6 @@ const openai = new OpenAI();
 
 export async function POST(req) {
   const { prompt } = await req.json();
-  console.log(formatPrompt(prompt));
 
   const completion = await openai.chat.completions.create({
     messages: [{ role: 'system', content: formatPrompt(prompt) }],

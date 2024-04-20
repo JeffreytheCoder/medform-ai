@@ -45,7 +45,7 @@ const openai = new OpenAI();
 export async function POST(req) {
   const { title, description, question, response, nextQuestion } =
     await req.json();
-
+  ``;
   const completion = await openai.chat.completions.create({
     messages: [
       {

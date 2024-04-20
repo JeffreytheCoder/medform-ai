@@ -15,10 +15,10 @@ export default function Home() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [responses, setResponses] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState('');
+  const [completed, setCompleted] = useState(false);
 
   const generateForm = async () => {
     const prompt = promptRef.current.value;
-    console.log(prompt);
     const coverResponse = await fetch('/api/cover', {
       method: 'POST',
       body: JSON.stringify({ prompt }),
@@ -31,7 +31,6 @@ export default function Home() {
     const coverOutput = JSON.parse(coverJson.output);
 
     const { title, description, keywords, questions } = coverOutput;
-    console.log(keywords);
     setCoverTitle(title);
     setCoverDescription(description);
     setQuestions(questions);
@@ -56,7 +55,10 @@ export default function Home() {
         coverDescription,
         question: lastQuestion,
         response,
-        nextQuestion: questions[questionIndex + 1],
+        nextQuestion:
+          questionIndex === questions.length - 1
+            ? questions[questionIndex + 1]
+            : 'There is no next question.',
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -64,25 +66,29 @@ export default function Home() {
     });
 
     const questionJson = await questionResponse.json();
-    console.log(questionJson);
     const { question, pass, keywords } = JSON.parse(questionJson.output);
-
-    const videoResponse = await fetch('/api/video', {
-      method: 'POST',
-      body: JSON.stringify({ keywords }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const { videoLink } = await videoResponse.json();
-    setVideoLink(videoLink);
 
     setCurrentQuestion(question);
     if (pass) {
+      if (questionIndex === questions.length - 1) {
+        setCompleted(true);
+        return;
+      }
+
       setResponses([...responses, response]);
       setQuestionIndex(questionIndex + 1);
+
+      const videoResponse = await fetch('/api/video', {
+        method: 'POST',
+        body: JSON.stringify({ keywords }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const { videoLink } = await videoResponse.json();
       setVideoLink(videoLink);
     }
+    console.log(questionIndex);
   };
 
   if (!isGenerated) {
@@ -105,7 +111,6 @@ export default function Home() {
           generateQuestion({
             question: '',
             response: '',
-            nextQuestion: questions[0],
           });
         }}
       />
