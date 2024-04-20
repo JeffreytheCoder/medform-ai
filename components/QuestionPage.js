@@ -1,14 +1,76 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
 import { Button } from './ui/button';
+import AudioTranscriber from './AudioTranscriber';
 import { Textarea } from './ui/textarea';
-import { Input } from './ui/input';
 
 export default function QuestionPage({ feedback, question, videoLink, onClickNext }) {
   const responseRef = useRef();
 
+
   const displayText = feedback + "\n\n" + question;
+
+  const [audioUrl, setAudioUrl] = useState('');
+  const audioRef = useRef(new Audio());
+
+  const updateResponse = (response) => {
+    responseRef.current.value = (
+      responseRef.current.value +
+      ' ' +
+      response
+    ).trim();
+  };
+
+  useEffect(() => {
+    if (audioUrl) {
+      const currentAudio = audioRef.current;
+      currentAudio.src = audioUrl;
+      currentAudio
+        .play()
+        .catch((error) =>
+          console.error('Error playing the audio file:', error)
+        );
+    }
+
+    return () => {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    };
+  }, [audioUrl]);
+
+  const handleTextToSpeech = async (text) => {
+    try {
+      const response = await fetch('/api/speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        console.error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.fileUrl) {
+        setAudioUrl(data.fileUrl);
+      } else {
+        console.error('Failed to load the audio file:', data.error);
+      }
+    } catch (error) {
+      console.error('Failed to fetch:', error);
+    }
+  };
+
+  useEffect(() => {
+    handleTextToSpeech(question);
+  }, [question]);
+
+
   return (
     <div
       style={{
@@ -40,7 +102,7 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
           left: '0',
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
           zIndex: '1',
         }}
       />
@@ -51,7 +113,8 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
           left: '50%',
           transform: 'translate(-50%, -50%)',
           color: 'white',
-          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
           zIndex: '2',
           width: '50%',
         }}
@@ -62,9 +125,10 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
           cursor
           sequence={[displayText]}
           wrapper="h3"
-          speed={65}
+          speed={30}
           className="scroll-m-20 text-2xl tracking-tight"
           style={{ whiteSpace: 'pre-line'}}
+
         />
         <div
           style={{
@@ -75,13 +139,31 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
           }}
         >
 
-            <Input style={{ width: '100%' }} ref={responseRef} key={question} />
+          <Textarea
+            style={{ width: '100%' }}
+            ref={responseRef}
+            key={question}
+            placeholder="Answer here"
+          />
+
         </div>
-        <Button
-          onClick={() => onClickNext(question, responseRef.current.value)}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'center',
+            gap: '10px',
+          }}
         >
-          Next
-        </Button>
+          <AudioTranscriber updateResponse={updateResponse} />
+          <Button
+            size="lg"
+            onClick={() => onClickNext(question, responseRef.current.value)}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
