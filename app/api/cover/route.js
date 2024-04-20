@@ -10,7 +10,7 @@ const formatPrompt = (user_prompt) => {
   {
     "title": "Weekly ACL Injury Update Form",
     "description": "This form is designed to collect weekly updates on your ACL injury recovery progress. Please answer the questions below to help us monitor your condition and adjust your treatment plan as necessary.",
-    "keywords": [“ACL injury”, "patient recovery"],
+    "keywords": ["ACL injury", "patient recovery"],
     "questions": [
       "What is your current level of pain on a scale of 0 (no pain) to 10 (severe pain)?",
       "Are you able to walk without assistance? If no, please describe the difficulties you are experiencing.",
@@ -33,7 +33,8 @@ const formatPrompt = (user_prompt) => {
 const openai = new OpenAI();
 
 export async function POST(req) {
-  const { prompt } = req.body;
+  const { prompt } = await req.json();
+  console.log(formatPrompt(prompt));
 
   const completion = await openai.chat.completions.create({
     messages: [{ role: 'system', content: formatPrompt(prompt) }],
@@ -41,5 +42,6 @@ export async function POST(req) {
   });
 
   const output = completion.choices[0].message.content;
+  console.log(output);
   return Response.json({ output });
 }
