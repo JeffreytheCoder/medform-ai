@@ -2,9 +2,52 @@
 import Image from "next/image";
 import { useState, useRef, useEffect } from 'react';
 import AudioTranscriber from "../components/AudioTranscriber";
-
+import CoverPage from '@/components/CoverPage';
+import QuestionPage from '@/components/QuestionPage';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function Home() {
+  const promptRef = useRef();
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [coverTitle, setCoverTitle] = useState('');
+  const [coverDescription, setCoverDescription] = useState('');
+  const [videoLink, setVideoLink] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [responses, setResponses] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [completed, setCompleted] = useState(false);
+
+  const generateForm = async () => {
+    const prompt = promptRef.current.value;
+    const coverResponse = await fetch('/api/cover', {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const coverJson = await coverResponse.json();
+    const coverOutput = JSON.parse(coverJson.output);
+
+    const { title, description, keywords, questions } = coverOutput;
+    setCoverTitle(title);
+    setCoverDescription(description);
+    setQuestions(questions);
+
+    const videoResponse = await fetch('/api/video', {
+      method: 'POST',
+      body: JSON.stringify({ keywords }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const { videoLink } = await videoResponse.json();
+    setVideoLink(videoLink);
+    setIsGenerated(true);
+  };
 
     const [coverVideoLink, setCoverVideoLink] = useState('');
     const [audioUrl, setAudioUrl] = useState('');
@@ -26,19 +69,51 @@ export default function Home() {
         };
     }, [audioUrl]);
 
-    const generateForm = async () => {
-        const videoResponse = await fetch('/api/video', {
-            method: 'POST',
-            body: JSON.stringify({'keywords': ['szsojfewoi', 'nature']}),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const {videoLink} = await videoResponse.json();
-        setCoverVideoLink(videoLink);
-    };
+  const generateQuestion = async ({ lastQuestion, response }) => {
+    const questionResponse = await fetch('/api/question', {
+      method: 'POST',
+      body: JSON.stringify({
+        coverTitle,
+        coverDescription,
+        question: lastQuestion,
+        response,
+        nextQuestion:
+          questionIndex === questions.length - 1
+            ? questions[questionIndex + 1]
+            : 'There is no next question.',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-    const handleTextToSpeech = async () => {
+    const questionJson = await questionResponse.json();
+    const { question, pass, keywords } = JSON.parse(questionJson.output);
+    
+    setCurrentQuestion(question);
+    if (pass) {
+      if (questionIndex === questions.length - 1) {
+        setCompleted(true);
+        return;
+      }
+
+      setResponses([...responses, response]);
+      setQuestionIndex(questionIndex + 1);
+
+      const videoResponse = await fetch('/api/video', {
+        method: 'POST',
+        body: JSON.stringify({ keywords }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const { videoLink } = await videoResponse.json();
+      setVideoLink(videoLink);
+    }
+    console.log(questionIndex);
+  };
+  
+  const handleTextToSpeech = async () => {
         const defaultText = "I shall be telling this with a sigh\n" +
             "Somewhere ages and ages hence:\n" +
             "Two roads diverged in a wood, and I—\n" +
@@ -73,34 +148,37 @@ export default function Home() {
         }
     };
 
+  if (!isGenerated) {
     return (
-        <div>
-            <div>
-                <button onClick={generateForm}>Generate Form</button>
-            </div>
-
-            <div>
-                <button onClick={handleTextToSpeech}>Convert Text to Speech</button>
-            </div>
-            <h1>---</h1>
-            <AudioTranscriber />
-
-            <video
-                style={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    top: '0',
-                    left: '0',
-                    objectFit: 'cover',
-                    zIndex: '-1',
-                }}
-                autoPlay
-                muted
-                loop
-                src={coverVideoLink}
-            />
-        </div>
-
-  );
+      <div>
+        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Describe the form you want to generate
+        </h3>
+        <Textarea ref={promptRef} />
+        <Button onClick={generateForm}>Generate Form</Button>
+      </div>
+    );
+  } else if (questionIndex === 0) {
+    return (
+      <CoverPage
+        title={coverTitle}
+        description={coverDescription}
+        videoLink={videoLink}
+        onClickStart={() => {
+          generateQuestion({
+            question: '',
+            response: '',
+          });
+        }}
+      />
+    );
+  } else {
+    return (
+      <QuestionPage
+        question={currentQuestion}
+        videoLink={videoLink}
+        onClickNext={generateQuestion}
+      />
+    );
+  }
 }
