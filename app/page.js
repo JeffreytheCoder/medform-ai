@@ -14,6 +14,7 @@ export default function Home() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [responses, setResponses] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState('');
+  const [currentFeedback, setCurrentFeedback] = useState('');
   const [completed, setCompleted] = useState(false);
 
   const generateForm = async () => {
@@ -33,6 +34,8 @@ export default function Home() {
     setCoverTitle(title);
     setCoverDescription(description);
     setQuestions(questions);
+    setQuestionIndex(0);
+    // checkpoint: questions properly set here
 
     const videoResponse = await fetch('/api/video', {
       method: 'POST',
@@ -47,6 +50,9 @@ export default function Home() {
   };
 
   const generateQuestion = async ({ lastQuestion, response }) => {
+      // console.log('index: ', questionIndex);
+      // console.log('questions length: ', questions.length);
+      // console.log(questions);
     const questionResponse = await fetch('/api/question', {
       method: 'POST',
       body: JSON.stringify({
@@ -55,8 +61,8 @@ export default function Home() {
         question: lastQuestion,
         response,
         nextQuestion:
-          questionIndex === questions.length - 1
-            ? questions[questionIndex + 1]
+          questionIndex <= questions.length - 1
+            ? questions[questionIndex]
             : 'There is no next question.',
       }),
       headers: {
@@ -65,9 +71,16 @@ export default function Home() {
     });
 
     const questionJson = await questionResponse.json();
-    const { question, pass, keywords } = JSON.parse(questionJson.output);
+
+
+    const { feedback, question, pass, keywords } = questionJson;
+    
 
     setCurrentQuestion(question);
+    if (questionIndex !== 0) {
+        setCurrentFeedback(feedback);
+    }
+
     if (pass) {
       if (questionIndex === questions.length - 1) {
         setCompleted(true);
@@ -87,8 +100,9 @@ export default function Home() {
       const { videoLink } = await videoResponse.json();
       setVideoLink(videoLink);
     }
-    console.log(questionIndex);
   };
+
+
 
   if (!isGenerated) {
     return (
@@ -117,6 +131,7 @@ export default function Home() {
   } else {
     return (
       <QuestionPage
+          feedback={currentFeedback}
         question={currentQuestion}
         videoLink={videoLink}
         onClickNext={generateQuestion}

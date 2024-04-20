@@ -5,8 +5,12 @@ import { Button } from './ui/button';
 import AudioTranscriber from './AudioTranscriber';
 import { Textarea } from './ui/textarea';
 
-export default function QuestionPage({ question, videoLink, onClickNext }) {
+export default function QuestionPage({ feedback, question, videoLink, onClickNext }) {
   const responseRef = useRef();
+
+
+  const displayText = feedback + "\n\n" + question;
+
   const [audioUrl, setAudioUrl] = useState('');
   const audioRef = useRef(new Audio());
 
@@ -66,6 +70,7 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
     handleTextToSpeech(question);
   }, [question]);
 
+
   return (
     <div
       style={{
@@ -114,13 +119,16 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
           width: '50%',
         }}
       >
+
         <TypeAnimation
           key={question}
           cursor
-          sequence={[question]}
+          sequence={[displayText]}
           wrapper="h3"
-          className={`scroll-m-20 text-2xl tracking-tight`}
           speed={30}
+          className="scroll-m-20 text-2xl tracking-tight"
+          style={{ whiteSpace: 'pre-line'}}
+
         />
         <div
           style={{
@@ -130,12 +138,14 @@ export default function QuestionPage({ question, videoLink, onClickNext }) {
             margin: '30px 0',
           }}
         >
+
           <Textarea
             style={{ width: '100%' }}
             ref={responseRef}
             key={question}
             placeholder="Answer here"
           />
+
         </div>
         <div
           style={{
