@@ -51,6 +51,8 @@ function PatientCard({ name, forms }) {
 
 export default function MyComponent() {
     const [query, setQuery] = useState("");
+    const [response, setResponse] = useState("");  // State to store the model's response
+
 
     const formData = [
         {
@@ -77,9 +79,27 @@ export default function MyComponent() {
         { name: "Patient Name", forms: 7 },
     ];
 
-    const handleGenerate = (userQuery) => {
+    const handleGenerate = async (userQuery) => {
+
+        const questionResponse = await fetch('/api/query', {
+            method: 'POST',
+            body: JSON.stringify({
+                userQuery
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
         console.log("Generate");
-        console.log(userQuery);
+
+        const output = await questionResponse.json();
+
+        try {
+            setResponse(output);
+        } catch (error) {
+            setResponse("Error from model.")
+        }
         setQuery("");
     }
 
@@ -146,9 +166,23 @@ export default function MyComponent() {
                 </aside>
                 <section className="flex gap-5 items-start mt-14 max-md:flex-wrap max-md:mt-10 max-md:max-w-full">
                     <div className="flex flex-col grow shrink-0 items-center basis-0 w-fit max-md:max-w-full">
-                        <h2 className="text-3xl font-bold text-zinc-900">
-                            Ask a MedAi question
-                        </h2>
+                        {response ?
+                            (
+                                <>
+                                    <div className="mt-5 p-4 bg-slate-100 rounded-lg">
+                                        <h3 className="text-lg font-semibold">Query Response:</h3>
+                                        <p>{response}</p>
+                                    </div>
+                                </>
+                            ) :
+                            (
+                               <>
+                                   <h2 className="text-3xl font-bold text-zinc-900">
+                                       Ask a MedAi question
+                                   </h2>
+                               </>
+                            )}
+
                         <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/2483d5158eae0eb98e480ad247181176ded133512583481e79aadbb678a5da0d?apiKey=4cd313e52a54443281316348492870be&" alt="" className="mt-9 aspect-square w-[43px]" />
                         <form className="flex gap-5 justify-end self-stretch px-6 py-3 text-2xl font-medium bg-slate-50 mt-[599px] rounded-[54.885px] max-md:flex-wrap max-md:pl-5 max-md:mt-10 max-md:max-w-full">
                             <label htmlFor="question" className="sr-only">Type a question</label>
@@ -169,7 +203,7 @@ export default function MyComponent() {
                                     className="flex flex-col flex-1 justify-center px-5 py-3 text-white whitespace-nowrap bg-indigo-600 rounded-[54.885px]">
                                 <div className="flex gap-2 justify-between">
                                     <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/901c9393d8537d59bbfd4280b398a43c9c4d713fe8fed32f6a9a2dc9da8bcda1?apiKey=4cd313e52a54443281316348492870be&" alt="" className="shrink-0 self-start aspect-square w-[27px]" />
-                                    <span>Generate</span>
+                                    <p>Generate</p>
                                 </div>
                             </button>
                         </form>
