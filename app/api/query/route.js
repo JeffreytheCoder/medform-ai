@@ -2,17 +2,20 @@ import OpenAI from 'openai';
 import { promises as fs } from 'fs';
 
 const formatPrompt = async (user_prompt) => {
+  // Read the content of three text files
+  const filePaths = [
+    'public/file1.txt',
+    'public/file2.txt',
+    'public/file3.txt',
+  ];
+  const fileContents = await Promise.all(
+    filePaths.map((path) => fs.readFile(path, 'utf8'))
+  );
 
-    // Read the content of three text files
-    const filePaths = ['data/file1.txt', 'data/file2.txt', 'data/file3.txt'];
-    const fileContents = await Promise.all(
-        filePaths.map(path => fs.readFile(path, 'utf8'))
-    );
+  // Concatenate the contents of the files
+  const prompt = fileContents.join('\n\n');
 
-    // Concatenate the contents of the files
-    const prompt = fileContents.join('\n\n');
-
-    const context = `You are a medical analyst that has been tasked with analyzing patient data. Below are patient responses ranging from Week 4 to Week 10 following an ACL surgery recovery. Your output should be in plain text, and it must not be in markdown format. Your task is to answer this question:
+  const context = `You are a medical analyst that has been tasked with analyzing patient data. Below are patient responses ranging from Week 4 to Week 10 following an ACL surgery recovery. Your output should be in plain text, and it must not be in markdown format. Your task is to answer this question:
     
     ${user_prompt}
     
@@ -21,30 +24,30 @@ const formatPrompt = async (user_prompt) => {
     # Patient Data:
  
     ${prompt}
-    \n`
+    \n`;
 
-    // Send the response from the GPT model to the client
+  // Send the response from the GPT model to the client
 
-    return context;
+  return context;
 };
 
 const openai = new OpenAI();
 
 export async function POST(req) {
-    const { userQuery } = await req.json();
+  const { userQuery } = await req.json();
 
-    const prompt = await formatPrompt(userQuery);
+  const prompt = await formatPrompt(userQuery);
 
-    const completion = await openai.chat.completions.create({
-        messages: [{ role: 'system', content: prompt }],
-        model: 'gpt-3.5-turbo',
-    });
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: 'system', content: prompt }],
+    model: 'gpt-3.5-turbo',
+  });
 
-    const output = completion.choices[0].message.content;
+  const output = completion.choices[0].message.content;
 
-    console.log(output);
+  console.log(output);
 
-    return new Response(JSON.stringify(output), {
-        headers: {'Content-Type': 'application/json'},
-    });
+  return new Response(JSON.stringify(output), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
