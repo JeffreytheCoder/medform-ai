@@ -11,6 +11,7 @@ const formatPrompt = async (user_prompt) => {
   const fileContents = await Promise.all(
     filePaths.map((path) => fs.readFile(path, 'utf8'))
   );
+  console.log(fileContents);
 
   // Concatenate the contents of the files
   const prompt = fileContents.join('\n\n');
