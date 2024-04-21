@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import CoverPage from '@/components/CoverPage';
 import QuestionPage from '@/components/QuestionPage';
 import { Button } from '@/components/ui/button';
+import GeneratePage from '@/components/GeneratePage';
 
 export default function Home() {
   const promptRef = useRef();
@@ -50,9 +51,9 @@ export default function Home() {
   };
 
   const generateQuestion = async ({ lastQuestion, response }) => {
-      // console.log('index: ', questionIndex);
-      // console.log('questions length: ', questions.length);
-      // console.log(questions);
+    // console.log('index: ', questionIndex);
+    // console.log('questions length: ', questions.length);
+    // console.log(questions);
     const questionResponse = await fetch('/api/question', {
       method: 'POST',
       body: JSON.stringify({
@@ -72,13 +73,11 @@ export default function Home() {
 
     const questionJson = await questionResponse.json();
 
-
     const { feedback, question, pass, keywords } = questionJson;
-    
 
     setCurrentQuestion(question);
     if (questionIndex !== 0) {
-        setCurrentFeedback(feedback);
+      setCurrentFeedback(feedback);
     }
 
     if (pass) {
@@ -102,17 +101,16 @@ export default function Home() {
     }
   };
 
-
-
   if (!isGenerated) {
     return (
-      <div>
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          Describe the form you want to generate
-        </h3>
-        <textarea ref={promptRef} />
-        <Button onClick={generateForm}>Generate Form</Button>
-      </div>
+      // <div>
+      //   <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+      //     Describe the form you want to generate
+      //   </h3>
+      //   <textarea ref={promptRef} />
+      //   <Button onClick={generateForm}>Generate Form</Button>
+      // </div>
+      <GeneratePage promptRef={promptRef} generateForm={generateForm} />
     );
   } else if (questionIndex === 0) {
     return (
@@ -131,11 +129,11 @@ export default function Home() {
   } else {
     return (
       <QuestionPage
-          feedback={currentFeedback}
-          question={currentQuestion}
-          videoLink={videoLink}
-          onClickNext={generateQuestion}
-          remainingQuestions={questions.length - questionIndex - 1}
+        feedback={currentFeedback}
+        question={currentQuestion}
+        videoLink={videoLink}
+        onClickNext={generateQuestion}
+        remainingQuestions={questions.length - questionIndex - 1}
       />
     );
   }

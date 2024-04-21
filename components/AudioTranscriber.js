@@ -67,7 +67,10 @@ const AudioTranscriber = ({ response, updateResponse }) => {
   };
 
   return (
-    <Button size="icon" onClick={isRecording ? stopRecording : startRecording}>
+    <Button
+      onClick={isRecording ? stopRecording : startRecording}
+      className="bg-indigo-600 py-6"
+    >
       {isRecording ? (
         <Stop className="h-4 w-4" />
       ) : (

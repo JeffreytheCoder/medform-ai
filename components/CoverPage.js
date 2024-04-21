@@ -58,13 +58,17 @@ export default function CoverPage({
           {title}
         </h1>
         <TypeAnimation
-          style={{ margin: '30px 0' }}
+          style={{ margin: '30px 0 40px 0' }}
           cursor
           sequence={[description]}
           wrapper="h3"
           className="scroll-m-20 text-2xl tracking-tight"
         />
-        <Button size="lg" onClick={onClickStart}>
+        <Button
+          size="lg"
+          onClick={onClickStart}
+          className="text-xl bg-indigo-600 p-6"
+        >
           Get Started
         </Button>
       </div>

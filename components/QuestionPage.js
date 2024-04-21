@@ -5,14 +5,19 @@ import { Button } from './ui/button';
 import AudioTranscriber from './AudioTranscriber';
 import { Textarea } from './ui/textarea';
 
-export default function QuestionPage({ feedback, question, videoLink, onClickNext, remainingQuestions }) {
+export default function QuestionPage({
+  feedback,
+  question,
+  videoLink,
+  onClickNext,
+  remainingQuestions,
+}) {
   const responseRef = useRef();
 
-
-  const displayText = feedback + "\n\n" + question;
-  const submittedText = "Thank you for your response! We wish you the best of luck in your recovery!";
+  const displayText = feedback + '\n\n' + question;
+  const submittedText =
+    'Thank you for your response! We wish you the best of luck in your recovery!';
   const [submitted, setSubmitted] = useState(false);
-
 
   const [audioUrl, setAudioUrl] = useState('');
   const audioRef = useRef(new Audio());
@@ -41,8 +46,6 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
       audioRef.current.currentTime = 0;
     };
   }, [audioUrl]);
-
-
 
   const handleTextToSpeech = async (text) => {
     try {
@@ -75,15 +78,13 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
     handleTextToSpeech(!submitted ? displayText : submittedText);
   }, [question, submitted]);
 
+  // function for submit
+  const handleSubmit = () => {
+    console.log('Form submitted.');
+    setSubmitted(true);
+  };
 
-
-    // function for submit
-    const handleSubmit = () => {
-        console.log("Form submitted.");
-        setSubmitted(true);
-    };
-
-    return (
+  return (
     <div
       style={{
         width: '100%',
@@ -131,80 +132,80 @@ export default function QuestionPage({ feedback, question, videoLink, onClickNex
           width: '50%',
         }}
       >
-          {!submitted ? (
-              <>
-                  <TypeAnimation
-                      key={question}
-                      cursor
-                      sequence={[displayText]}
-                      wrapper="h3"
-                      speed={30}
-                      className="scroll-m-20 text-2xl tracking-tight"
-                      style={{ whiteSpace: 'pre-line'}}
-                  />
+        {!submitted ? (
+          <>
+            <TypeAnimation
+              key={question}
+              cursor
+              sequence={[displayText]}
+              wrapper="h3"
+              speed={30}
+              className="scroll-m-20 text-2xl tracking-tight"
+              style={{ whiteSpace: 'pre-line' }}
+            />
 
-                  <div
-                      style={{
-                          width: '100%',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          margin: '30px 0',
-                      }}
-                  >
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                margin: '30px 0',
+              }}
+            >
+              <Textarea
+                style={{ width: '100%' }}
+                ref={responseRef}
+                key={question}
+                placeholder="Answer here"
+              />
+            </div>
 
-                  <Textarea
-                      style={{ width: '100%', }}
-                      ref={responseRef}
-                      key={question}
-                      placeholder="Answer here"
-                  />
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+                justifyContent: 'center',
+                gap: '10px',
+              }}
+            >
+              <AudioTranscriber updateResponse={updateResponse} />
 
-                  </div>
+              {remainingQuestions > 0 && (
+                <Button
+                  size="lg"
+                  className="text-xl bg-indigo-600 p-6"
+                  onClick={() =>
+                    onClickNext(question, responseRef.current.value)
+                  }
+                >
+                  Next
+                </Button>
+              )}
 
-                  <div
-                      style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          width: '100%',
-                          justifyContent: 'center',
-                          gap: '10px',
-                      }}
-                  >
-
-                      <AudioTranscriber updateResponse={updateResponse} />
-
-                      {remainingQuestions > 0 && (<Button
-                          size="lg"
-                          onClick={() => onClickNext(question, responseRef.current.value)}
-                          >
-                          Next
-                      </Button>)}
-
-                      {remainingQuestions <= 0 && (<Button
-                          size="lg"
-                          onClick={handleSubmit}
-                          >
-                          Submit
-                          </Button>
-                      )}
-                  </div>
-              </>
-          ) : (
-
-              <>
-                  <TypeAnimation
-                      cursor
-                      sequence={[submittedText]}
-                      wrapper="h3"
-                      speed={30}
-                      className="scroll-m-20 text-2xl tracking-tight"
-                  />
-              </>
-          )}
+              {remainingQuestions <= 0 && (
+                <Button
+                  size="lg"
+                  className="text-xl bg-indigo-600 p-6"
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </Button>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <TypeAnimation
+              cursor
+              sequence={[submittedText]}
+              wrapper="h3"
+              speed={30}
+              className="scroll-m-20 text-2xl tracking-tight"
+            />
+          </>
+        )}
       </div>
-
-
-
     </div>
   );
 }
