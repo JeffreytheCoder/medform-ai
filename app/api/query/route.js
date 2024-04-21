@@ -12,7 +12,7 @@ const formatPrompt = async (user_prompt) => {
     // Concatenate the contents of the files
     const prompt = fileContents.join('\n\n');
 
-    const context = `You are a medical analyst that has been tasked with analyzing patient data. Below are patient responses ranging from Week 4 to Week 10 following an ACL surgery recovery. Your task is to answer this question:
+    const context = `You are a medical analyst that has been tasked with analyzing patient data. Below are patient responses ranging from Week 4 to Week 10 following an ACL surgery recovery. Your output should be in plain text, and it must not be in markdown format. Your task is to answer this question:
     
     ${user_prompt}
     
