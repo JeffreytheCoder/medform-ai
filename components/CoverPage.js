@@ -64,7 +64,9 @@ export default function CoverPage({
           wrapper="h3"
           className="scroll-m-20 text-2xl tracking-tight"
         />
-        <Button onClick={onClickStart}>Get Started</Button>
+        <Button size="lg" onClick={onClickStart}>
+          Get Started
+        </Button>
       </div>
     </div>
   );

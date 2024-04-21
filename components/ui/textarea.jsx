@@ -14,15 +14,28 @@ const Textarea = React.forwardRef(({ className, ...props }, ref) => {
   };
 
   React.useImperativeHandle(ref, () => ({
-    // This function exposes the `value` and any other properties or methods you want to expose to the parent component
     get value() {
       return textareaRef.current.value;
     },
     set value(val) {
       textareaRef.current.value = val;
+      adjustHeight(); // Adjust height after setting the value
     },
     adjustHeight,
   }));
+
+  // Initialize MutationObserver to observe changes in the textarea value
+  React.useEffect(() => {
+    const observer = new MutationObserver(adjustHeight);
+    if (textareaRef.current) {
+      observer.observe(textareaRef.current, { attributes: true, attributeFilter: ['value'] });
+    }
+
+    // Disconnect the observer on cleanup
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Handle input change and adjust height
   const handleChange = (e) => {
