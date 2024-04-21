@@ -132,9 +132,10 @@ export default function Home() {
     return (
       <QuestionPage
           feedback={currentFeedback}
-        question={currentQuestion}
-        videoLink={videoLink}
-        onClickNext={generateQuestion}
+          question={currentQuestion}
+          videoLink={videoLink}
+          onClickNext={generateQuestion}
+          remainingQuestions={questions.length - questionIndex - 1}
       />
     );
   }
