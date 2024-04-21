@@ -175,9 +175,10 @@ export default function QuestionPage({
                 <Button
                   size="lg"
                   className="text-xl bg-indigo-600 p-6"
-                  onClick={() =>
-                    onClickNext(question, responseRef.current.value)
-                  }
+                  onClick={() => {
+                    console.log(question, responseRef.current.value);
+                    onClickNext(question, responseRef.current.value);
+                  }}
                 >
                   Next
                 </Button>

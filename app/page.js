@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from 'react';
 import CoverPage from '@/components/CoverPage';
 import QuestionPage from '@/components/QuestionPage';
-import { Button } from '@/components/ui/button';
 import GeneratePage from '@/components/GeneratePage';
 
 export default function Home() {
@@ -50,15 +49,14 @@ export default function Home() {
     setIsGenerated(true);
   };
 
-  const generateQuestion = async ({ lastQuestion, response }) => {
-    // console.log('index: ', questionIndex);
-    // console.log('questions length: ', questions.length);
-    // console.log(questions);
+  const generateQuestion = async (lastQuestion, response) => {
+    console.log(questions);
+    console.log(coverTitle, coverDescription, lastQuestion, response);
     const questionResponse = await fetch('/api/question', {
       method: 'POST',
       body: JSON.stringify({
-        coverTitle,
-        coverDescription,
+        title: coverTitle,
+        description: coverDescription,
         question: lastQuestion,
         response,
         nextQuestion:
@@ -102,16 +100,7 @@ export default function Home() {
   };
 
   if (!isGenerated) {
-    return (
-      // <div>
-      //   <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-      //     Describe the form you want to generate
-      //   </h3>
-      //   <textarea ref={promptRef} />
-      //   <Button onClick={generateForm}>Generate Form</Button>
-      // </div>
-      <GeneratePage promptRef={promptRef} generateForm={generateForm} />
-    );
+    return <GeneratePage promptRef={promptRef} generateForm={generateForm} />;
   } else if (questionIndex === 0) {
     return (
       <CoverPage
@@ -119,10 +108,7 @@ export default function Home() {
         description={coverDescription}
         videoLink={videoLink}
         onClickStart={() => {
-          generateQuestion({
-            question: '',
-            response: '',
-          });
+          generateQuestion('', '');
         }}
       />
     );
