@@ -3,18 +3,18 @@ import { promises as fs } from 'fs';
 
 const formatPrompt = async (user_prompt) => {
   // Read the content of three text files
-  const filePaths = [
-    'public/file1.txt',
-    'public/file2.txt',
-    'public/file3.txt',
-  ];
-  const fileContents = await Promise.all(
-    filePaths.map((path) => fs.readFile(path, 'utf8'))
-  );
-  console.log(fileContents);
+  //   const filePaths = [
+  //     'public/file1.txt',
+  //     'public/file2.txt',
+  //     'public/file3.txt',
+  //   ];
+  //   const fileContents = await Promise.all(
+  //     filePaths.map((path) => fs.readFile(path, 'utf8'))
+  //   );
+  //   console.log(fileContents);
 
   // Concatenate the contents of the files
-  const prompt = fileContents.join('\n\n');
+  const prompt = '';
 
   const context = `You are a medical analyst that has been tasked with analyzing patient data. Below are patient responses ranging from Week 4 to Week 10 following an ACL surgery recovery. Your output should be in plain text, and it must not be in markdown format. Your task is to answer this question:
     
