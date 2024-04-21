@@ -92,7 +92,7 @@ export async function POST(req) {
         content: new_prompt,
       },
     ],
-    model: 'gpt-4-turbo',
+    model: 'gpt-3.5-turbo',
   });
   const question_msg = completion.choices[0].message.content;
 
@@ -111,7 +111,7 @@ export async function POST(req) {
         content: new_feedback,
       },
     ],
-    model: 'gpt-4-turbo',
+    model: 'gpt-3.5-turbo',
   });
 
   const feedback_msg = feedback.choices[0].message.content;

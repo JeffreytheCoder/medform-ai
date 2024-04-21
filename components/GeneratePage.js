@@ -1,24 +1,5 @@
 import { useState } from 'react';
-
-function Header() {
-  return (
-    <header className="flex gap-5 self-stretch px-20 py-5 w-full bg-white shadow-sm max-md:flex-wrap max-md:px-5 max-md:max-w-full">
-      <nav className="flex gap-5 justify-between my-auto text-xl whitespace-nowrap">
-        <div className="font-semibold text-indigo-600">Forms</div>
-        <div className="font-medium text-zinc-400">Dashboard</div>
-      </nav>
-      <div className="flex gap-1">
-        <div className="shrink-0 w-10 h-10 rounded-full bg-zinc-800" />
-        <img
-          loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/cd70ac8adfcef8cea219ee03e79c8772b66ef174307aaf1e03b5a119a899d568?apiKey=4cd313e52a54443281316348492870be&"
-          alt=""
-          className="shrink-0 my-auto w-4 aspect-square"
-        />
-      </div>
-    </header>
-  );
-}
+import Header from './Header';
 
 function HeroImage() {
   return (
