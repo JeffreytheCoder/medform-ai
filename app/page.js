@@ -37,6 +37,10 @@ export default function Home() {
     setQuestionIndex(0);
     // checkpoint: questions properly set here
 
+
+    console.log(questions)
+
+
     const videoResponse = await fetch('/api/video', {
       method: 'POST',
       body: JSON.stringify({ keywords }),
