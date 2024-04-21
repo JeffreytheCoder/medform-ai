@@ -22,7 +22,7 @@ Here is an example of input-output pair:
     "description": "This form is designed to collect weekly updates on your ACL injury recovery progress. Please answer the questions below to help us monitor your condition and adjust your treatment plan as necessary.",
     "keywords": ["ACL injury", "patient recovery"],
     "questions": [
-      "What is your current level of pain on a scale of 0 (no pain) to 10 (severe pain)?",
+      "How would you describe your pain this week? Is this dull, sharp, aching, or throbbing? Where is the pain located?",
       "Are you able to walk without assistance? If no, please describe the difficulties you are experiencing.",
       "Have you noticed any swelling around the knee? If yes, how would you rate the swelling on a scale of 1 (mild) to 5 (severe)?",
       "How many days this week did you perform physical therapy exercises?",

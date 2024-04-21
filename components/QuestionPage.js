@@ -42,8 +42,13 @@ export default function QuestionPage({
     }
 
     return () => {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl); // Clean up the object URL
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
   }, [audioUrl]);
 
@@ -59,16 +64,13 @@ export default function QuestionPage({
 
       if (!response.ok) {
         console.error('Network response was not ok');
+        const errorText = await response.text();
+        throw new Error('Server error: ' + errorText);
       }
 
-      const data = await response.json();
-      console.log(data);
-
-      if (data.fileUrl) {
-        setAudioUrl(data.fileUrl);
-      } else {
-        console.error('Failed to load the audio file:', data.error);
-      }
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+      setAudioUrl(audioUrl);
     } catch (error) {
       console.error('Failed to fetch:', error);
     }
