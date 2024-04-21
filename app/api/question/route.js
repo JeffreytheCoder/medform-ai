@@ -63,10 +63,9 @@ const write_feedback = (
   
     ${response}
     
-    Based on the patient's answer, give an empathetic feedback to the patient's response. 
-    The tone of this feedback needs to be very positive and personal.
-    The tone needs to be casual, like family members speaking to each other. 
-    It should be 1-2 sentences. Be as short as possible.
+    Based on the patient's answer, give a 1-2 sentences feedback to the patient's response. Be as short as possible.
+    Refer to the specific things in the patient's response to the last question.
+    Your tone of should be positive, personal, and casual.
   `;
 };
 
